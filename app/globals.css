@@ -258,6 +258,21 @@ body {
   opacity: 1;
 }
 
+/* Mobile: hide overlay and disable hover effects */
+@media (max-width: 767px) {
+  .project-card-overlay {
+    display: none !important;
+  }
+
+  .project-card-image .project-card-title-over-image {
+    display: none !important;
+  }
+
+  .project-card:hover {
+    transform: none;
+  }
+}
+
 /* ─── Achievement Card ─── */
 .achievement-card {
   background: #161616;

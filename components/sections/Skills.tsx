@@ -56,19 +56,11 @@ function generateNodes(): SkillNode[] {
 
 export default function Skills() {
   const [nodes] = useState<SkillNode[]>(() => generateNodes());
-  const [isMobile, setIsMobile] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const mousePos = useRef({ x: -1, y: -1 });
   const animRef = useRef<number>(0);
   const [isVisible, setIsVisible] = useState(false);
-
-  useEffect(() => {
-    setIsMobile(window.innerWidth < 768);
-    const handleResize = () => setIsMobile(window.innerWidth < 768);
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -89,7 +81,9 @@ export default function Skills() {
   }, []);
 
   useEffect(() => {
-    if (isMobile || !isVisible) return;
+    // Only run canvas animation on desktop
+    const isDesktop = window.matchMedia("(min-width: 768px)").matches;
+    if (!isDesktop || !isVisible) return;
 
     const canvas = canvasRef.current;
     const container = containerRef.current;
@@ -168,14 +162,15 @@ export default function Skills() {
       container.removeEventListener("mousemove", handleMouseMove);
       cancelAnimationFrame(animRef.current);
     };
-  }, [isMobile, isVisible, nodes, handleMouseMove]);
+  }, [isVisible, nodes, handleMouseMove]);
 
-  // Mobile fallback: grid layout
-  if (isMobile) {
-    return (
-      <section id="skills" className="py-24 sm:py-32 px-6">
-        <div className="max-w-4xl mx-auto">
-          <AnimatedText text="My Toolkit" />
+  return (
+    <section id="skills" className="py-24 sm:py-32 px-6">
+      <div className="max-w-5xl mx-auto">
+        <AnimatedText text="My Toolkit" />
+
+        {/* ─── Mobile: Grouped Pills Layout ─── */}
+        <div className="skills-mobile-pills md:hidden">
           <div className="space-y-8">
             {Object.entries(skillGroups).map(([group, skills], gi) => (
               <motion.div
@@ -209,67 +204,62 @@ export default function Skills() {
             ))}
           </div>
         </div>
-      </section>
-    );
-  }
 
-  return (
-    <section id="skills" className="py-24 sm:py-32 px-6">
-      <div className="max-w-5xl mx-auto">
-        <AnimatedText text="My Toolkit" />
+        {/* ─── Desktop: Constellation Graph ─── */}
+        <div className="skills-desktop-constellation hidden md:block">
+          {/* Legend */}
+          <motion.div
+            className="flex flex-wrap gap-6 mb-8"
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.3 }}
+          >
+            {Object.entries(groupColors).map(([group, color]) => (
+              <div key={group} className="flex items-center gap-2">
+                <div
+                  className="w-2 h-2 rounded-full"
+                  style={{ backgroundColor: color }}
+                />
+                <span className="font-mono text-[10px] tracking-wider uppercase text-warm-dim">
+                  {group}
+                </span>
+              </div>
+            ))}
+          </motion.div>
 
-        {/* Legend */}
-        <motion.div
-          className="flex flex-wrap gap-6 mb-8"
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.3 }}
-        >
-          {Object.entries(groupColors).map(([group, color]) => (
-            <div key={group} className="flex items-center gap-2">
-              <div
-                className="w-2 h-2 rounded-full"
-                style={{ backgroundColor: color }}
-              />
-              <span className="font-mono text-[10px] tracking-wider uppercase text-warm-dim">
-                {group}
-              </span>
-            </div>
-          ))}
-        </motion.div>
+          {/* Constellation */}
+          <div
+            ref={containerRef}
+            className="relative w-full"
+            style={{ height: "500px" }}
+          >
+            <canvas ref={canvasRef} className="absolute inset-0 w-full h-full" />
 
-        {/* Constellation */}
-        <div
-          ref={containerRef}
-          className="relative w-full"
-          style={{ height: "500px" }}
-        >
-          <canvas ref={canvasRef} className="absolute inset-0 w-full h-full" />
-
-          {nodes.map((node, i) => (
-            <motion.div
-              key={node.name}
-              className="skill-node"
-              style={{
-                left: `${node.x}%`,
-                top: `${node.y}%`,
-                transform: "translate(-50%, -50%)",
-                borderColor: groupColors[node.group] + "40",
-              }}
-              initial={{ opacity: 0, scale: 0 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              transition={{
-                duration: 0.5,
-                delay: i * 0.05,
-                type: "spring",
-                stiffness: 200,
-              }}
-            >
-              {node.name}
-            </motion.div>
-          ))}
+            {nodes.map((node, i) => (
+              <motion.div
+                key={node.name}
+                className="skill-node"
+                style={{
+                  left: `${node.x}%`,
+                  top: `${node.y}%`,
+                  transform: "translate(-50%, -50%)",
+                  borderColor: groupColors[node.group] + "40",
+                }}
+                initial={{ opacity: 0, scale: 0 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{
+                  duration: 0.5,
+                  delay: i * 0.05,
+                  type: "spring",
+                  stiffness: 200,
+                }}
+              >
+                {node.name}
+              </motion.div>
+            ))}
+          </div>
         </div>
       </div>
     </section>

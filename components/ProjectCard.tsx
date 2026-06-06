@@ -32,14 +32,14 @@ export default function ProjectCard({ project }: ProjectCardProps) {
             <span className="badge">{project.label}</span>
           </div>
         )}
-        {/* Hover overlay with full description */}
-        <div className="project-card-overlay hidden md:flex">
+        {/* Hover overlay with full description — hidden on mobile via CSS */}
+        <div className="project-card-overlay">
           <p className="font-mono text-sm text-warm leading-relaxed">
             {project.description}
           </p>
         </div>
-        {/* Project name over image */}
-        <div className="absolute bottom-4 left-4 z-10 hidden md:block">
+        {/* Project name over image — hidden on mobile via CSS */}
+        <div className="project-card-title-over-image absolute bottom-4 left-4 z-10">
           <h3 className="font-playfair text-xl sm:text-2xl font-bold text-warm">
             {project.name}
           </h3>
