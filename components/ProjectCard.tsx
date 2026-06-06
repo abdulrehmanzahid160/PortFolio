@@ -33,13 +33,13 @@ export default function ProjectCard({ project }: ProjectCardProps) {
           </div>
         )}
         {/* Hover overlay with full description */}
-        <div className="project-card-overlay">
+        <div className="project-card-overlay hidden md:flex">
           <p className="font-mono text-sm text-warm leading-relaxed">
             {project.description}
           </p>
         </div>
         {/* Project name over image */}
-        <div className="absolute bottom-4 left-4 z-10">
+        <div className="absolute bottom-4 left-4 z-10 hidden md:block">
           <h3 className="font-playfair text-xl sm:text-2xl font-bold text-warm">
             {project.name}
           </h3>
@@ -48,8 +48,12 @@ export default function ProjectCard({ project }: ProjectCardProps) {
 
       {/* Card Content */}
       <div className="p-5">
-        {/* Description (truncated) */}
-        <p className="font-mono text-xs text-warm-dim mb-4 line-clamp-2 leading-relaxed">
+        {/* Project name (Mobile only) */}
+        <h3 className="font-playfair text-xl font-bold text-warm mb-3 md:hidden">
+          {project.name}
+        </h3>
+        {/* Description (truncated on desktop, full on mobile) */}
+        <p className="font-mono text-xs text-warm-dim mb-4 md:line-clamp-2 leading-relaxed">
           {project.description}
         </p>
 
